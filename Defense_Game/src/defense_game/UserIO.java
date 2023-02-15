@@ -21,7 +21,7 @@ public class UserIO {
 
 	public UserIO(User user) {
 		this.user = user;
-		this.path = "C:/Embedded_KHJ/work/Defense_Game/user";
+		this.path = "user/";
 	}
 
 	public ArrayList<User> ranking() {
