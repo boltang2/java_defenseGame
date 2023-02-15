@@ -2,6 +2,7 @@ package defense_game;
 
 import java.io.Serializable;
 
+@SuppressWarnings("serial")
 public class User implements Serializable {
 	private String nickName;
 	private int score;

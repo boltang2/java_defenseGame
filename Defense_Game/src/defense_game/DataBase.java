@@ -3,6 +3,7 @@ package defense_game;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
+@SuppressWarnings("serial")
 public class DataBase extends JFrame {
 	private String[] towerName;
 	private int[][] towerAtackSpeed;

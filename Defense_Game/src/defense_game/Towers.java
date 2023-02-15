@@ -3,6 +3,7 @@ package defense_game;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
+@SuppressWarnings("serial")
 public class Towers extends JFrame {
 	private String name; // 이름
 	private int[] atackSpeed; // 공격속도

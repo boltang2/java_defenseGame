@@ -25,6 +25,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
+@SuppressWarnings("serial")
 public class DefenseGame_Frame extends JFrame implements Runnable {
 	// 모든 타워 정보 집합
 	ArrayList<Towers> towers = new ArrayList<Towers>();
@@ -68,6 +69,8 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 	boolean isClear = false;
 	// true : 게임 실행 / 실행 전
 	boolean isStart = false;
+	// true : 스테이지 진행상태 / 진행 중
+	boolean isEnd = true;
 	// stages에서 현재 라운드 정보 가져오기 위한 index
 	int curStageIndex = 0;
 	// 목숨
@@ -512,7 +515,9 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 			if ((e.getSource() == upgrade_b && e.getY() == 20) || (e.getSource() == unMount_b && e.getY() == -1)) {
 
 			} else {
-				field.remove(up_un_p);
+				if (e.getX() != 50) {
+					field.remove(up_un_p);
+				}
 			}
 			repaint();
 		};
@@ -547,6 +552,7 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 				tower_b.setBounds(0, 0, 50, 50);
 				tower_b.setActionCommand(f.format(date));
 				tower_b.addActionListener(showTower_info);
+				tower_b.addMouseListener(remove_btn);
 				tower_p.add(tower_b);
 				actTower_info.put(f.format(date), towerInfo);
 				actTower_display.put(f.format(date), tower_p);
@@ -584,7 +590,6 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 		fields.setIsTower(towerCoordInfo[2], towerCoordInfo[3]);
 		fields.setIsPass();
 		fields.isPassPoss(0, 0);
-		boolean[][] t = fields.getIsTower();
 		if (fields.getFastestPass() != null) {
 			fields.fixRoute(fields.getIsTower());
 			myMoney -= price;
@@ -665,7 +670,6 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 			try {
 				price = Integer.parseInt(towerInfo.getUpgradePrice()[towerInfo.getLevel()]);
 			} catch (Exception e2) {
-				// TODO: handle exception
 				price = 0;
 			}
 			if (myMoney < price) {
@@ -709,9 +713,7 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 	ActionListener btnNextStage_btn = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (e.getSource() == nextStage_b_1) { // 중지
-													// 눌렀을
-													// 경우
+			if (e.getSource() == nextStage_b_1) { // 중지 눌렀을 경우
 				nextStage_p.setVisible(false);
 				nextStage_b_3.setVisible(true);
 			} else { // 중지를 누른후 생성된 다음 스테이지 버튼 누르거나 다이렉트로 다음 스테이지 버튼
@@ -721,7 +723,6 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 					nextStage_b_3.setVisible(false);
 				}
 				if (isRun && isClear) {
-					System.out.println("다음 스테이지 정보");
 					if (curStageIndex < stages.size() - 1) {
 						curStageIndex++;
 						remainMon = stages.get(curStageIndex).getMount();
@@ -752,9 +753,7 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 				getStageInfo(isDie);
 				startGame_b.setVisible(false);
 				stopGame_b.setVisible(true);
-				System.out.println("스테이지 시작");
 			} else {
-				System.out.println("스테이지 진행중");
 			}
 		}
 	}; // btnStartStage_btn()
@@ -784,6 +783,7 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 				newChallenge_op.setVisible(false);
 				EndBGM.stopMusic();
 				MainBGM.play(-1, -30f);
+				isEnd = true;
 			} else {
 				isOut = false;
 				dispose();
@@ -844,7 +844,6 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 			int y_pixel = unit.getCurYXPixel()[0];
 			int x_pixel = unit.getCurYXPixel()[1];
 			String str = ((JLabel) actMonster_display.get(index_key).getComponent(1)).getText();
-			String logo = str.split(":")[0].trim();
 			int hp = Integer.parseInt(str.split(":")[1].trim());
 			if (y_index == 8 && x_index == 16 || hp <= 0) {
 				actMonster_display.remove(index_key);
@@ -868,7 +867,6 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 
 	// createMonster : 스테이지에 몬스터 생성 (actMonster_display)
 	public void createMonster(int i) {
-		System.out.println(i + "번째 유닛 생성");
 		actMonster_info.get(i).setId(i);
 		JPanel unit = new JPanel();
 		unit.setLayout(null);
@@ -950,7 +948,6 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 	// 타워 설치가능한 경우 활성화 이미지 삽입 후 커서 좌표 수정
 	// 타워 설치가 불가능한 경우 비활성화 이미지 삽입 후 현재 커서 좌표 유지
 	public JPanel checkActivation(int x, int y, String str) {
-		System.out.println(str);
 		int x_index = Math.round((float) x / 50);
 		int y_index = Math.round((float) y / 50);
 		JPanel towerXY_p = new JPanel();
@@ -1210,14 +1207,13 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 		newChallenge_op.setVisible(true);
 	} // gameSet()
 
+	@SuppressWarnings("static-access")
 	@Override
 	public synchronized void run() {
 		int count_createMonster = 0;
 		int count_alarm = 620;
 		int tempo = 0;
 		int i = 0;
-		int timer = 0;
-		boolean isEnd = true;
 
 		while (isOut) {
 			try {
@@ -1236,6 +1232,9 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 					}
 					if (remainMon == 0 && !isClear) {
 						if (curStageIndex == stages.size() - 1) { // 모든 스테이지 완료
+							EndBGM = new Bgm("clearGame.wav");
+							EndBGM.play(-1, -30f);
+							MainBGM.stopMusic();
 							endStage_p.setVisible(true);
 						} else { // 그렇지 않을 경우
 							nextStage_p.setVisible(true);
@@ -1293,9 +1292,7 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 				clearTime++;
 				printStageInfo();
 			} catch (Exception e) {
-				// TODO: handle exception
 			}
 		}
-		System.out.println("게임 종료!");
 	} // run()
 }
