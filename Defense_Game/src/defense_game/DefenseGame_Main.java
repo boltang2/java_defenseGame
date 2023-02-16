@@ -2,7 +2,8 @@ package defense_game;
 
 public class DefenseGame_Main {
 	public static void main(String[] args) {
-		new DefenseGame_Frame();
+		DefenseGame_Frame DG = new DefenseGame_Frame();
+		DG.runningGame.start();
 	}
 
 }

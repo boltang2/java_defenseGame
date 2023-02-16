@@ -47,7 +47,7 @@ public class DataBase extends JFrame {
 		for (int i = 0; i < 5; i++) {
 			stageName[i] = "[" + (i+1) + "]stage";
 			stageMount[i] = (i + 1) * 15;
-			stageMonHp[i] = (i + 1) * 4 - 2;
+			stageMonHp[i] = (i + 1) * 4 + 6;
 			String path = "imgSet/monsters/" + stageMonName[i] + ".png";
 			monImg[i] = new ImageIcon(path);
 		}

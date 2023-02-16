@@ -119,6 +119,7 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 	JButton endStage_b_1;
 	JButton endStage_b_2;
 	JButton endStage_b_3;
+	JLabel score_l;
 	JLayeredPane field;
 	JLayeredPane choiceTower_lay;
 	JPanel cursor_towerXY_pixel_p = new JPanel();
@@ -140,15 +141,14 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 	JButton upgrade_b = new JButton();
 	JButton unMount_b = new JButton();
 	Thread t;
+	public Thread runningGame;
 
 	public DefenseGame_Frame() {
 		initialization();
 		mainFrame();
 		MainBGM = new Bgm("startGame.wav");
 		MainBGM.play(-1, -30f);
-		Thread runningGame;
 		runningGame = new Thread(this);
-		runningGame.start();
 		setVisible(true);
 
 	} // Defense_Frame
@@ -162,14 +162,17 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 		setLayout(null);
 		setResizable(false);
 		setLocationRelativeTo(null);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		// setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
+				isOut = false;
+				MainBGM.stopMusic();
+				dispose();
 
 			}
 		});
-		;
+
 		frame = new JLayeredPane();
 		frame.setLayout(null);
 		frame.setBounds(0, 0, 1150, 650);
@@ -227,8 +230,8 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 		// 스테이지 이름 --------------------------------------------------------------------
 		stName_l = new JLabel();
 		stName_l.setBounds(5, 5, 100, 20);
-		stName_l.setFont(new Font("", Font.BOLD, 15));
-		stName_l.setForeground(Color.green);
+		stName_l.setFont(new Font("HY헤드라인M", Font.BOLD, 12));
+		stName_l.setForeground(new Color(255, 255, 255));
 		stageInfo_img = new JLabel(new ImageIcon("imgSet/field/stName.png"));
 		stageInfo_img.setBounds(5, 5, 100, 20);
 		stageInfo_lay.add(stName_l, new Integer(1));
@@ -237,8 +240,8 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 		// 이름
 		monName_l = new JLabel(" 이름 : ");
 		monName_l.setBounds(60, 30, 145, 15);
-		monName_l.setFont(new Font("", Font.BOLD, 11));
-		monName_l.setForeground(Color.green);
+		monName_l.setFont(new Font("HY헤드라인M", Font.BOLD, 10));
+		monName_l.setForeground(new Color(255, 255, 255));
 		stageInfo_img = new JLabel(new ImageIcon("imgSet/field/stMon.png"));
 		stageInfo_img.setBounds(60, 30, 145, 15);
 		stageInfo_lay.add(monName_l, new Integer(1));
@@ -246,8 +249,8 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 		// 체력
 		monHp_l = new JLabel(" 체력 : ");
 		monHp_l.setBounds(60, 55, 70, 15);
-		monHp_l.setFont(new Font("", Font.BOLD, 11));
-		monHp_l.setForeground(Color.green);
+		monHp_l.setFont(new Font("HY헤드라인M", Font.BOLD, 10));
+		monHp_l.setForeground(new Color(255, 255, 255));
 		stageInfo_img = new JLabel(new ImageIcon("imgSet/field/stStat.png"));
 		stageInfo_img.setBounds(60, 55, 70, 15);
 		stageInfo_lay.add(monHp_l, new Integer(1));
@@ -262,8 +265,8 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 		// 생성 갯수
 		stMount_l = new JLabel(" 갯수 : ");
 		stMount_l.setBounds(135, 55, 70, 15);
-		stMount_l.setFont(new Font("", Font.BOLD, 11));
-		stMount_l.setForeground(Color.green);
+		stMount_l.setFont(new Font("HY헤드라인M", Font.BOLD, 10));
+		stMount_l.setForeground(new Color(255, 255, 255));
 		stageInfo_img = new JLabel(new ImageIcon("imgSet/field/stStat.png"));
 		stageInfo_img.setBounds(135, 55, 70, 15);
 		stageInfo_lay.add(stMount_l, new Integer(1));
@@ -273,7 +276,7 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 		remain_l = new JLabel(": ");
 		remain_l.setBounds(100, 75, 60, 20);
 		remain_l.setFont(new Font("", Font.BOLD, 14));
-		remain_l.setForeground(Color.green);
+		remain_l.setForeground(new Color(255, 255, 255));
 		stageInfo_img = new JLabel(new ImageIcon("imgSet/field/enemy.png"));
 		stageInfo_img.setBounds(75, 75, 60, 20);
 		stageInfo_lay.add(remain_l, new Integer(1));
@@ -282,7 +285,7 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 		life_l = new JLabel(": ");
 		life_l.setBounds(30, 75, 60, 20);
 		life_l.setFont(new Font("", Font.BOLD, 14));
-		life_l.setForeground(Color.green);
+		life_l.setForeground(new Color(255, 255, 255));
 		stageInfo_img = new JLabel(new ImageIcon("imgSet/field/life.png"));
 		stageInfo_img.setBounds(5, 75, 60, 20);
 		stageInfo_lay.add(life_l, new Integer(1));
@@ -290,7 +293,7 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 		// 돈
 		money_l = new JLabel(": " + myMoney);
 		money_l.setBounds(170, 75, 60, 20);
-		money_l.setForeground(Color.green);
+		money_l.setForeground(new Color(255, 255, 255));
 		money_l.setFont(new Font("", Font.BOLD, 14));
 		stageInfo_img = new JLabel(new ImageIcon("imgSet/field/money.png"));
 		stageInfo_img.setBounds(145, 75, 60, 20);
@@ -301,7 +304,7 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 		// 전장 창 생성 ---------------------------------------------------------------------
 		field = new JLayeredPane();
 		field.setLayout(null);
-		field.setBounds(20, 120, 850, 450);
+		field.setBounds(20, 120, 870, 450);
 		ImageIcon fieldImg = new ImageIcon("imgSet/field/Field.png");
 		JLabel backgroundF = new JLabel(fieldImg);
 		backgroundF.setBounds(0, 0, 850, 450);
@@ -326,8 +329,8 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 		board_l.setBounds(5, 5, 200, 80);
 		tcPanel.add(board_l, new Integer(1));
 		JLabel tcTitle = new JLabel("【 타워 선택 】");
-		tcTitle.setFont(new Font("", Font.BOLD, 15));
-		tcTitle.setForeground(Color.green);
+		tcTitle.setFont(new Font("HY헤드라인M", Font.BOLD, 14));
+		tcTitle.setForeground(new Color(255, 255, 255));
 		tcTitle.setHorizontalAlignment(JLabel.CENTER);
 		tcTitle.setBounds(0, 0, 200, 20);
 		tcTitle.setHorizontalAlignment(JLabel.CENTER);
@@ -353,7 +356,7 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 		// -----------------------------------------------------------------------------
 
 		// 스테이지 속도 조정 ----------------------------------------------------------------
-		speedGame_b = new JButton(new ImageIcon("imgSet/field/speed.png"));
+		speedGame_b = new JButton(new ImageIcon("imgSet/field/x1.png"));
 		speedGame_b.setBounds(130, 5, 20, 20);
 		speedGame_b.addActionListener(btnSpeedGame_btn);
 		speedGame_b.setVisible(true);
@@ -362,7 +365,7 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 		// 경고 문구 생성 -------------------------------------------------------------------
 		warningMsg_l.setBounds(10, 140, 190, 40);
 		warningMsg_l.setFont(new Font("", Font.BOLD, 12));
-		warningMsg_l.setForeground(Color.green);
+		warningMsg_l.setForeground(new Color(255, 255, 255));
 		warningMsg_l.setHorizontalTextPosition(JLabel.CENTER);
 		warningMsg_img.setIcon(new ImageIcon("imgSet/field/msg.png"));
 		warningMsg_img.setBounds(10, 140, 190, 40);
@@ -445,10 +448,18 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 		cancel_b.setActionCommand("취소");
 		// -----------------------------------------------------------------------------
 
+		// 점수 보드 판 ---------------------------------------------------------------------
+		score_l = new JLabel();
+		score_l.setBounds(920, 75, 180, 20);
+		score_l.setFont(new Font("", Font.BOLD, 20));
+		score_l.setForeground(new Color(255, 255, 255));
+		score_l.setHorizontalAlignment(JLabel.CENTER);
+
 		frame.add(gameTitle, new Integer(1));
 		frame.add(stageInfo_lay, new Integer(1));
 		frame.add(field, new Integer(1));
 		frame.add(choiceTower_lay, new Integer(1));
+		frame.add(score_l, new Integer(1));
 
 	} // mainFrame
 
@@ -457,6 +468,8 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			speed_index = (speed_index + 1) % 3;
+			String path = "imgSet/field/x" + (speed_index + 1) + ".png";
+			speedGame_b.setIcon(new ImageIcon(path));
 		}
 	}; // btnSpeedGame_btn()
 
@@ -587,6 +600,9 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 		if (myMoney < price) {
 			return 1;
 		}
+		if (towerCoordInfo[2] == 8 && towerCoordInfo[3] == 16) {
+			return 2;
+		}
 		fields.setIsTower(towerCoordInfo[2], towerCoordInfo[3]);
 		fields.setIsPass();
 		fields.isPassPoss(0, 0);
@@ -601,13 +617,17 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 
 	} // routeCheck()
 
-	// mountCheck_btn : 설치 버튼 클릭시 조건에 따라 타워 설치 or 거부
+	// mountCheck_btn : 설치 버튼 클릭시 조건에 따라 타워 설치 or 거부 123
 	MouseListener mountCheck_btn = new MouseAdapter() {
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			speed_index = (speed_index + 1) % 3;
 			int x_pixel = e.getX() - 25;
 			int y_pixel = e.getY() - 25;
+			field.remove(cursor_towerXY_pixel_p);
+			field.remove(mount_towerXY_pixel_p);
+			cursor_towerXY_pixel_p = checkActivation(x_pixel, y_pixel, selectedTowerName);
+			field.add(cursor_towerXY_pixel_p, new Integer(1));
 			towerCoordInfo = checkActivation(x_pixel, y_pixel);
 			mount_towerXY_pixel_p.setLayout(null);
 			JButton mount_b = new JButton(new ImageIcon("imgSet/field/mount_b.png"));
@@ -787,6 +807,8 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 			} else {
 				isOut = false;
 				dispose();
+				EndBGM.stopMusic();
+
 			}
 		}
 	};
@@ -804,6 +826,8 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 			} else if (e.getSource() == endStage_b_2) { // 그냥 종료
 				isOut = false;
 				dispose();
+				EndBGM.stopMusic();
+
 			} else if (e.getSource() == endStage_b_3) {
 				ArrayList<User> users = new UserIO(user).ranking();
 				JFrame ranking = new JFrame("Ranking");
@@ -872,11 +896,11 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 		unit.setLayout(null);
 		JLabel unitImg = new JLabel(actMonster_info.get(i).getImg());
 		unitImg.setBounds(2, 2, 42, 32);
-		// unitImg.setBorder(new LineBorder(Color.green, 1));
+		// unitImg.setBorder(new LineBorder(new Color(255,255,255), 1));
 		JLabel unitHp = new JLabel("HP : " + actMonster_info.get(i).getMonHp());
 		unitHp.setBounds(1, 35, 44, 9);
 		unitHp.setFont(new Font("", Font.BOLD, 10));
-		unitHp.setForeground(Color.green);
+		unitHp.setForeground(new Color(255, 255, 255));
 		unitHp.setHorizontalAlignment(JLabel.CENTER);
 		JLabel bgUnit = new JLabel(new ImageIcon("imgSet/monsters/bgUnit.png"));
 		bgUnit.setBounds(0, 0, 46, 46);
@@ -1111,8 +1135,8 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 			charTower_l = new JLabel("<html><body>〔단일 공격〕<br>높은 사거리와 낮은 연사속도</body></html>");
 		}
 		charTower_l.setBounds(5, 140, 200, 40);
-		charTower_l.setFont(new Font("", Font.BOLD, 12));
-		charTower_l.setForeground(Color.green);
+		charTower_l.setFont(new Font("HY헤드라인M", Font.BOLD, 12));
+		charTower_l.setForeground(new Color(255, 255, 255));
 		charTower_l.setHorizontalAlignment(JLabel.CENTER);
 		JLabel charTower_img = new JLabel(new ImageIcon("imgSet/field/msg.png"));
 		charTower_img.setBounds(10, 140, 190, 40);
@@ -1136,8 +1160,8 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 		JLabel towerFactor_img;
 		for (int i = 0; i < 5; i++) {
 			towerFactor_l[i].setBounds(70, i * 25 + 10, 125, 20);
-			towerFactor_l[i].setFont(new Font("", Font.BOLD, 13));
-			towerFactor_l[i].setForeground(Color.green);
+			towerFactor_l[i].setFont(new Font("HY헤드라인M", Font.BOLD, 12));
+			towerFactor_l[i].setForeground(new Color(255, 255, 255));
 			towerFactor_img = new JLabel(new ImageIcon("imgSet/field/towerFactor_img.png"));
 			towerFactor_img.setBounds(70, i * 25 + 10, 125, 20);
 			board_l.add(towerFactor_l[i], new Integer(1));
@@ -1163,7 +1187,7 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 		JLabel towerLevel_l = new JLabel("  Level " + tower.getLevel());
 		towerLevel_l.setBounds(5, 60, 50, 15);
 		towerLevel_l.setFont(new Font("", Font.BOLD, 12));
-		towerLevel_l.setForeground(Color.green);
+		towerLevel_l.setForeground(new Color(255, 255, 255));
 		towerLevel_l.setHorizontalTextPosition(JLabel.CENTER);
 		board_l.add(towerLevel_l, new Integer(1));
 		JLabel towerImg_l_2 = new JLabel(new ImageIcon("imgSet/field/towerImg2.png"));
@@ -1178,8 +1202,8 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 		towerFactor_l[4] = new JLabel("   비용  :  " + tower.getUpgradePrice()[tower.getLevel()]);
 		for (int i = 0; i < 5; i++) {
 			towerFactor_l[i].setBounds(70, i * 25 + 10, 125, 20);
-			towerFactor_l[i].setFont(new Font("", Font.BOLD, 13));
-			towerFactor_l[i].setForeground(Color.green);
+			towerFactor_l[i].setFont(new Font("HY헤드라인M", Font.BOLD, 12));
+			towerFactor_l[i].setForeground(new Color(255, 255, 255));
 			towerFactor_img = new JLabel(new ImageIcon("imgSet/field/towerFactor_img.png"));
 			towerFactor_img.setBounds(70, i * 25 + 10, 125, 20);
 			board_l.add(towerFactor_l[i], new Integer(1));
@@ -1198,6 +1222,7 @@ public class DefenseGame_Frame extends JFrame implements Runnable {
 			stMount_l.setText(" 갯수 : " + stages.get(curStageIndex).getMount());
 			remain_l.setText(": " + remainMon);
 			life_l.setText(": " + life);
+			score_l.setText("점수  : " + score);
 		}
 		money_l.setText(": " + myMoney);
 	} // printStageInfo()
